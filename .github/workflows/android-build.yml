@@ -1,0 +1,95 @@
+name: Build Android APK
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+env:
+  RENPY_VERSION: '8.3.4'
+  ANDROID_COMPILE_SDK: '34'
+  ANDROID_BUILD_TOOLS: '34.0.0'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Install system dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            libsdl2-dev libsdl2-image-dev libsdl2-mixer-dev \
+            libsdl2-ttf-dev libavcodec-dev libavformat-dev \
+            libswresample-dev libfreetype6-dev libfribidi-dev \
+            libharfbuzz-dev libpng-dev libjpeg-dev unzip wget
+
+      - name: Download Ren'Py SDK
+        run: |
+          wget -q "https://www.renpy.org/dl/${RENPY_VERSION}/renpy-${RENPY_VERSION}-sdk.tar.bz2"
+          tar xjf "renpy-${RENPY_VERSION}-sdk.tar.bz2"
+          echo "RENPY_SDK=$PWD/renpy-${RENPY_VERSION}-sdk" >> $GITHUB_ENV
+
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v3
+        with:
+          packages: |
+            platform-tools
+            platforms;android-${{ env.ANDROID_COMPILE_SDK }}
+            build-tools;${{ env.ANDROID_BUILD_TOOLS }}
+            ndk;25.2.9519653
+
+      - name: Configure Ren'Py Android build
+        run: |
+          RAPT="$RENPY_SDK/rapt"
+          mkdir -p "$RAPT/project"
+          cat > "$RAPT/project/local.properties" <<EOF
+          sdk.dir=$ANDROID_HOME
+          ndk.dir=$ANDROID_HOME/ndk/25.2.9519653
+          EOF
+
+      - name: Prepare game files
+        run: |
+          mkdir -p "$RENPY_SDK/rapt/project/game"
+          rsync -av --exclude='.git' --exclude='.github' \
+            "$GITHUB_WORKSPACE/" "$RENPY_SDK/rapt/project/game/"
+
+      - name: Configure signing
+        if: ${{ secrets.KEYSTORE_BASE64 != '' }}
+        run: |
+          echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 -d > "$RENPY_SDK/rapt/project/keystore.jks"
+          cat > "$RENPY_SDK/rapt/project/keystore.properties" <<EOF
+          storeFile=../keystore.jks
+          storePassword=${{ secrets.KEYSTORE_PASSWORD }}
+          keyAlias=${{ secrets.KEY_ALIAS }}
+          keyPassword=${{ secrets.KEY_PASSWORD }}
+          EOF
+
+      - name: Build APK
+        run: |
+          cd "$RENPY_SDK/rapt/project"
+          chmod +x ./gradlew
+          ./gradlew assembleRelease --no-daemon
+
+      - name: Locate build outputs
+        run: |
+          find "$RENPY_SDK/rapt/project/build" -name "*.apk" -o -name "*.aab" || true
+
+      - name: Upload APK artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: uninvited-guest-apk
+          path: |
+            ${{ env.RENPY_SDK }}/rapt/project/build/outputs/**/*.apk
+            ${{ env.RENPY_SDK }}/rapt/project/build/outputs/**/*.aab
+          if-no-files-found: warn
