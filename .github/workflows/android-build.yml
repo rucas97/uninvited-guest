@@ -34,7 +34,7 @@ jobs:
             "icon_name": "Uninvited Guest",
             "version": "1.0.0",
             "numeric_version": 1,
-            "orientation": "portrait",
+            "orientation": "landscape",
             "permissions": ["VIBRATE"],
             "store": "none",
             "update_keystores": false
@@ -61,9 +61,16 @@ jobs:
           build_type: apk
           out_dir: target
 
-      - name: Upload APK artifact
+      - name: Upload APK Artifact
         uses: actions/upload-artifact@v4
         with:
           name: uninvited-guest-apk
           path: target/*.apk
           if-no-files-found: warn
+          
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v1
+        if: startsWith(github.ref, 'refs/tags/')
+        with:
+          files: target/*.apk
+          generate_release_notes: true

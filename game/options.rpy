@@ -216,3 +216,33 @@ define gui.text_font = "fonts/Vazirmatn-Regular.ttf"
 
 # Force Right-to-Left rendering for Persian
 define config.rtl = True
+
+# Force Portrait Resolution
+define config.screen_width = 1080
+define config.screen_height = 1920
+
+# Skip the default Ren'Py loading screen
+define config.developer = "auto"
+define config.default_fullscreen = True
+
+# Force Landscape Resolution
+define config.screen_width = 1920
+define config.screen_height = 1080
+
+# Remove the default Ren'Py splash logo
+label splashscreen:
+    return
+
+# Hide the default game name in the corner
+define gui.show_name = False
+
+# Make the dialogue text much bigger
+define gui.text_size = 45
+define gui.name_text_size = 55
+
+# Force Right-to-Left (RTL) text rendering for Persian
+define style.default.language = "arabic"
+
+# Make the dialogue text a bit smaller
+define gui.text_size = 32
+define gui.name_text_size = 38
