@@ -10,7 +10,6 @@ jobs:
     runs-on: ubuntu-latest
     env:
       ANDROID_NDK_HOME: ""
-      # Tell Ren'Py to use the virtual display we will create
       DISPLAY: ":99"
     steps:
       - name: Checkout repository
@@ -21,6 +20,29 @@ jobs:
         with:
           distribution: 'adopt-hotspot'
           java-version: '21'
+
+      # --- CACHE REN'PY SDK ---
+      - name: Cache Ren'Py SDK
+        uses: actions/cache@v4
+        with:
+          path: ~/.renpy
+          key: ${{ runner.os }}-renpy-8.3.4
+
+      # --- CACHE ANDROID SDK & NDK ---
+      - name: Cache Android SDK
+        uses: actions/cache@v4
+        with:
+          path: ~/android-sdk
+          key: ${{ runner.os }}-android-sdk-34-ndk25
+
+      # --- CACHE GRADLE ---
+      - name: Cache Gradle
+        uses: actions/cache@v4
+        with:
+          path: ~/.gradle/caches
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-
 
       - name: Install xvfb (Virtual Display)
         run: |
