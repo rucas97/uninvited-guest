@@ -9,7 +9,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     env:
-      # This is required because GitHub's runners provide an incompatible NDK
+      # Required because GitHub-hosted runners provide an incompatible NDK
       ANDROID_NDK_HOME: ""
     steps:
       - name: Checkout repository
@@ -27,7 +27,7 @@ jobs:
           ANDROID_KEYSTORE: ${{ secrets.KEYSTORE_BASE64 }}
 
       - name: Install Ren'Py and Android SDK
-        uses: Ayowel/renpy-setup-action@v1.1.0
+        uses: Ayowel/renpy-setup-action@v2.0.1
         with:
           action: install
           version: 8.3.4
@@ -40,7 +40,7 @@ jobs:
             key.store=${{ github.workspace }}/android.keystore
 
       - name: Build Android APK
-        uses: Ayowel/renpy-setup-action@v1.1.0
+        uses: Ayowel/renpy-setup-action@v2.0.1
         with:
           action: android_build
           build_type: apk
