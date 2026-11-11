@@ -10,6 +10,8 @@ jobs:
     runs-on: ubuntu-latest
     env:
       ANDROID_NDK_HOME: ""
+      # Tell Ren'Py to use the virtual display we will create
+      DISPLAY: ":99"
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -19,6 +21,16 @@ jobs:
         with:
           distribution: 'adopt-hotspot'
           java-version: '21'
+
+      - name: Install xvfb (Virtual Display)
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y xvfb
+
+      - name: Start xvfb
+        run: |
+          Xvfb :99 -screen 0 1024x768x24 > /dev/null 2>&1 &
+          sleep 3
 
       - name: Create keystore
         run: base64 -d <<<"$ANDROID_KEYSTORE" > android.keystore
