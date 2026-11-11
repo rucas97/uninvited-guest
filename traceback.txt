@@ -1,0 +1,37 @@
+﻿I'm sorry, but an uncaught exception occurred.
+
+While running game code:
+  File "game/gui.rpy", line 70, in script
+    define gui.text_size = gui.scale(22)
+  File "game/gui.rpy", line 70, in script
+    define gui.text_size = gui.scale(22)
+  File "game/gui.rpy", line 70, in <module>
+    define gui.text_size = gui.scale(22)
+AttributeError: 'StoreModule' object has no attribute 'scale'
+
+-- Full Traceback ------------------------------------------------------------
+
+Full traceback:
+  File "D:\android\renpy-8.3.4-sdk\renpy\bootstrap.py", line 359, in bootstrap
+    renpy.main.main()
+  File "D:\android\renpy-8.3.4-sdk\renpy\main.py", line 541, in main
+    renpy.game.context().run(node)
+  File "game/gui.rpy", line 70, in script
+    define gui.text_size = gui.scale(22)
+  File "lib/python3.9/future/utils/__init__.py", line 444, in raise_
+  File "game/gui.rpy", line 70, in script
+    define gui.text_size = gui.scale(22)
+  File "D:\android\renpy-8.3.4-sdk\renpy\ast.py", line 2241, in execute
+    self.set()
+  File "D:\android\renpy-8.3.4-sdk\renpy\ast.py", line 2255, in set
+    value = renpy.python.py_eval_bytecode(self.code.bytecode)
+  File "D:\android\renpy-8.3.4-sdk\renpy\python.py", line 1202, in py_eval_bytecode
+    return eval(bytecode, globals, locals)
+  File "game/gui.rpy", line 70, in <module>
+    define gui.text_size = gui.scale(22)
+AttributeError: 'StoreModule' object has no attribute 'scale'
+
+Windows-10-10.0.19045 AMD64
+Ren'Py 8.3.4.24120703
+Ren'Py 7 Default GUI 1.0
+Wed Nov 11 12:14:28 2026

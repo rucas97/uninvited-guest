@@ -207,3 +207,12 @@ init python:
 ## by a slash.
 
 # define build.itch_project = "renpytom/test-project"
+
+# Set language for Right-to-Left text
+define config.language = "persian"
+
+# Set the Farsi font
+define gui.text_font = "fonts/Vazirmatn-Regular.ttf"
+
+# Force Right-to-Left rendering for Persian
+define config.rtl = True
