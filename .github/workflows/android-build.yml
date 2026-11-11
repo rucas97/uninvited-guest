@@ -9,7 +9,6 @@ jobs:
   build:
     runs-on: ubuntu-latest
     env:
-      # Required because GitHub-hosted runners provide an incompatible NDK
       ANDROID_NDK_HOME: ""
     steps:
       - name: Checkout repository
@@ -25,6 +24,22 @@ jobs:
         run: base64 -d <<<"$ANDROID_KEYSTORE" > android.keystore
         env:
           ANDROID_KEYSTORE: ${{ secrets.KEYSTORE_BASE64 }}
+
+      - name: Create .android.json configuration
+        run: |
+          cat > .android.json << 'JSONEOF'
+          {
+            "package": "com.rucas97.uninvitedguest",
+            "name": "Uninvited Guest",
+            "icon_name": "Uninvited Guest",
+            "version": "1.0.0",
+            "numeric_version": 1,
+            "orientation": "portrait",
+            "permissions": ["VIBRATE"],
+            "store": "none",
+            "update_keystores": false
+          }
+          JSONEOF
 
       - name: Install Ren'Py and Android SDK
         uses: Ayowel/renpy-setup-action@v2.0.1
@@ -44,7 +59,6 @@ jobs:
         with:
           action: android_build
           build_type: apk
-          game: project
           out_dir: target
 
       - name: Upload APK artifact
